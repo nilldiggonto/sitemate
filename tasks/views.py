@@ -1,25 +1,39 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Tasks
+from rest_framework import serializers
+
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tasks
+        fields = "__all__"
 
 
 class TaskCrudAPIView(APIView):
     def get(self, request):
         tasks = Tasks.objects.all()
-        return Response({"tasks": tasks})
-
+        serializer = TaskSerializer(tasks, many=True)
+        return Response({"tasks": serializer.data})
     def post(self, request):
-        task = Tasks.objects.create(**request.data)
-        return Response({"task": task})
+        #create new task
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"task": serializer.data})
+        else:
+            return Response(serializer.errors)
 
     def put(self, request):
         task = Tasks.objects.get(id=request.data["id"])
-        task.title = request.data["title"]
-        task.description = request.data["description"]
-        task.save()
-        return Response({"task": task})
+        
+        serializer = TaskSerializer(task, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"task": serializer.data})
+        else:
+            return Response(serializer.errors)
 
     def delete(self, request):
         task = Tasks.objects.get(id=request.data["id"])
         task.delete()
-        return Response({"task": task})
+        return Response({"status": "success"})
