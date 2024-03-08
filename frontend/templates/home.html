@@ -58,13 +58,13 @@
             data.forEach(element => {
 
                 document.getElementById('task').innerHTML += `
-                    <div class="card-header d-flex justify-content-between mb-2">
+                    <div class="card-header d-flex justify-content-between mb-2" id="unique${element.id}">
                             <h5>${element.id}</h5>
                             <h5>${element.title}</h5>
                             <h5>${element.description}</h5>
                             <div>
                                 <button class="btn btn-sm btn-warning">Edit</button>
-                                <button class="btn btn-sm btn-danger">Delete</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteList(${element.id})">Delete</button>
 
                             </div>
                         </div>
@@ -91,13 +91,13 @@
             .then(data => {
                 element = data['task']
                 document.getElementById('task').innerHTML += `
-                <div class="card-header d-flex justify-content-between mb-2">
+                <div class="card-header d-flex justify-content-between mb-2" id="unique${element.id}">
                     <h5>${element.id}</h5>
                     <h5>${element.title}</h5>
                     <h5>${element.description}</h5>
                     <div>
                         <button class="btn btn-sm btn-warning">Edit</button>
-                        <button class="btn btn-sm btn-danger">Delete</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteList(${element.id})">Delete</button>
 
                     </div>
                 </div>
@@ -123,6 +123,27 @@
             .then(response => response.json())
             .then(data => {
                 renderHtml(data['tasks'])
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            })
+        }
+
+        function deleteList(id){
+            fetch('/api/',{
+                method: 'DELETE',
+                headers: {
+                    'Content-type': 'application/json',
+                    'X-CSRFToken': "{{ csrf_token }}"
+                },
+                body: JSON.stringify({
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // showList()
+                document.getElementById(`unique${id}`).remove()
             })
             .catch((error) => {
                 console.error('Error:', error);
