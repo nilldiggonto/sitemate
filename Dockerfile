@@ -16,4 +16,4 @@ COPY . .
 # Expose the Gunicorn port
 EXPOSE 8010
 
-CMD python manage.py migrate && gunicorn --config conf/gunicorn.conf.py sitemate.wsgi --preload
+CMD python manage.py migrate && python manage.py test frontend && gunicorn --config conf/gunicorn.conf.py sitemate.wsgi --preload

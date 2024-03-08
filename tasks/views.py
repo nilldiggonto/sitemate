@@ -34,6 +34,9 @@ class TaskCrudAPIView(APIView):
             return Response(serializer.errors)
 
     def delete(self, request):
-        task = Tasks.objects.get(id=request.data["id"])
+        task = Tasks.objects.filter(id=request.data.get("id",None))
+        if not task:
+            return Response({"status": "failed"})
+        task = task.last()
         task.delete()
         return Response({"status": "success"})
